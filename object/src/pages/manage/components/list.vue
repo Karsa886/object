@@ -20,13 +20,7 @@
 
     <!-- 分页 -->
 
-    <el-pagination
-      background
-      layout="prev, pager, next"
-      @current-change="cPage"
-      :page-size="size"
-      :total="total"
-    ></el-pagination>
+    <el-pagination background layout="prev, pager, next" @current-change="cPage" :page-size="size" :total="total"></el-pagination>
   </div>
 </template>
 <script>
@@ -38,8 +32,8 @@ export default {
   computed: {
     ...mapGetters({
       list: "manage/list",
-      total: "manage/total",
-      size: "manage/size",
+      total:"manage/total",
+       size:"manage/size"
     }),
   },
   data() {
@@ -48,8 +42,8 @@ export default {
   methods: {
     ...mapActions({
       requestList: "manage/requestList",
-      requestTotal: "manage/requestTotal",
-      changePage: "manage/changePage",
+      requestTotal:"manage/requestTotal",
+      changePage:"manage/changePage"
     }),
     edit(id) {
       this.$emit("edit", id);
@@ -60,20 +54,20 @@ export default {
         if (res.data.code == 200) {
           successAlert("删除成功");
           this.requestList();
-          this.requestTotal();
+          this.requestTotal()
         } else {
           warningAlert(res.data.msg);
         }
       });
     },
     //修改页码
-    cPage(a) {
-      this.changePage(a);
-      this.requestList();
-    },
+    cPage(a){
+        this.changePage(a)
+        this.requestList()
+    }
   },
   mounted() {
-    this.requestTotal();
+      this.requestTotal();
     this.requestList();
   },
 };

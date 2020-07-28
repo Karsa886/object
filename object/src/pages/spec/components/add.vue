@@ -55,9 +55,12 @@ export default {
       },
     };
   },
-  mounted() {},
+  mounted() {
+   
+  },
   methods: {
     ...mapActions({
+      
       requestList: "spec/requestList",
       requestTotal: "spec/requestTotal",
     }),
@@ -112,7 +115,7 @@ export default {
           //重新获取角色列表数据
           this.requestTotal();
           //重新获取总的数量
-          this.requestTotal();
+          this.requestList();
         } else {
           warningAlert(res.data.msg);
         }
@@ -130,7 +133,7 @@ export default {
     },
     //点击了修改
     update() {
-      if (this.attrArr.some((item) => item.value == "")) {
+       if (this.attrArr.some((item) => item.value == "")) {
         warningAlert("属性规格均不能为空");
         return;
       }

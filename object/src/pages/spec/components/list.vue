@@ -4,8 +4,8 @@
       <el-table-column prop="id" label="规格编号" width="180"></el-table-column>
       <el-table-column prop="specsname" label="规格名称" width="180"></el-table-column>
       <el-table-column label="规格属性" width="180">
-        <template slot-scope="scope">
-          <el-tag v-for="item in scope.row.attrs" :key="item">{{item}}</el-tag>
+         <template slot-scope="scope">
+           <el-tag v-for="item in scope.row.attrs" :key="item">{{item}}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="状态">
@@ -24,13 +24,7 @@
 
     <!-- 分页 -->
 
-    <el-pagination
-      background
-      layout="prev, pager, next"
-      @current-change="cPage"
-      :page-size="size"
-      :total="total"
-    ></el-pagination>
+    <el-pagination background layout="prev, pager, next" @current-change="cPage" :page-size="size" :total="total"></el-pagination>
   </div>
 </template>
 <script>
@@ -42,8 +36,8 @@ export default {
   computed: {
     ...mapGetters({
       list: "spec/list",
-      total: "spec/total",
-      size: "spec/size",
+      total:"spec/total",
+       size:"spec/size"
     }),
   },
   data() {
@@ -52,8 +46,8 @@ export default {
   methods: {
     ...mapActions({
       requestList: "spec/requestList",
-      requestTotal: "spec/requestTotal",
-      changePage: "spec/changePage",
+      requestTotal:"spec/requestTotal",
+      changePage:"spec/changePage"
     }),
     edit(id) {
       this.$emit("edit", id);
@@ -63,25 +57,28 @@ export default {
       requestSpecDelete({ id: id }).then((res) => {
         if (res.data.code == 200) {
           successAlert("删除成功");
-
+          
           this.requestList();
-          this.requestTotal();
+          this.requestTotal()
         } else {
           warningAlert(res.data.msg);
         }
       });
     },
     //修改页码
-    cPage(a) {
-      this.changePage(a);
-      this.requestList();
-    },
+    cPage(a){
+        this.changePage(a)
+        this.requestList()
+    }
   },
   mounted() {
-    this.requestTotal();
+      this.requestTotal();
     this.requestList();
   },
 };
 </script>
 <style scoped>
+span{
+  margin-right: 4px;
+}
 </style>

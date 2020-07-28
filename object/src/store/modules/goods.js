@@ -1,4 +1,4 @@
-import { requestSpecList, requestSpecCount } from "../../util/request"
+import { requestGoodsList, requestGoodsCount } from "../../util/request"
 const state = {
     //列表数据
     list: [],
@@ -12,9 +12,6 @@ const state = {
 const mutations = {
     //修改list
     changeList(state, arr) {
-        arr.forEach(i => {
-            i.attrs = JSON.parse(i.attrs)
-        });
         state.list = arr;
     },
     //修改总数
@@ -28,18 +25,13 @@ const mutations = {
 }
 const actions = {
     //获取列表数据
-    //调用这个action,如果要分页，就不用传参；如果要取所有的数据，就传递一个true
-    requestList(context, bool) {
-        var params = {}
-        if (bool) {
-            params = {}
-        } else {
-            params = {
-                page: context.state.page,
-                size: context.state.size
-            }
+   
+    requestList(context) {
+        const params = {
+            page: context.state.page,
+            size: context.state.size
         }
-        requestSpecList(params).then(res => {
+        requestGoodsList(params).then(res => {
             //没有取到数据
             if (res.data.list.length == 0 && context.state.page > 1) {
                 context.commit("changePage", context.state.page - 1);
@@ -51,7 +43,7 @@ const actions = {
     },
     //获取总的数量
     requestTotal(context) {
-        requestSpecCount().then(res => {
+        requestGoodsCount().then(res => {
             context.commit("changeTotal", res.data.list[0].total)
         })
     },

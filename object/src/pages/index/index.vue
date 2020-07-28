@@ -2,6 +2,11 @@
   <div>
     <el-container class="page">
       <el-aside width="200px">
+        <!-- 导航开始 -->
+        <!-- 
+            router 路由模式
+            index 是唯一标识，配置了路由，就改为自己的path
+        -->
         <el-menu
           class="el-menu-vertical-demo"
           background-color="#20222a"
@@ -14,35 +19,28 @@
             <i class="el-icon-setting"></i>
             <span slot="title">首页</span>
           </el-menu-item>
-          <el-submenu index="1">
+
+          <!-- 有目录的循环 -->
+          <el-submenu v-show="hasChildren" :index="item.id+''" v-for="(item) in user.menus">
             <template slot="title">
-              <i class="el-icon-coin"></i>
-              <span>系统设置</span>
+              <i :class="item.icon"></i>
+              <span>{{item.title}}</span>
             </template>
-            <el-menu-item index="/menu">菜单管理</el-menu-item>
-            <el-menu-item index="/role">角色管理</el-menu-item>
-            <el-menu-item index="/manage">管理员管理</el-menu-item>
+            <el-menu-item v-for="(i) in item.children" :key="i.title" :index="i.url">{{i.title}}</el-menu-item>
           </el-submenu>
 
-          <el-submenu index="2">
-            <template slot="title">
-              <i class="el-icon-shopping-cart-full"></i>
-              <span>商城管理</span>
-            </template>
-            <el-menu-item index="/cate">商品分类</el-menu-item>
-            <el-menu-item index="/spec">商品规格</el-menu-item>
-            <el-menu-item index="/goods">商品管理</el-menu-item>
-            <el-menu-item index="/member">会员管理</el-menu-item>
-            <el-menu-item index="/banner">轮播图管理</el-menu-item>
-            <el-menu-item index="/seckill">秒杀活动</el-menu-item>
-          </el-submenu>
+          <!-- 没有目录，只有菜单 -->
+         <el-menu-item v-show="!hasChildren"  :index="i.url" v-for="(i) in user.menus" :key="i.title">
+            <span slot="title">{{i.title}}</span>
+          </el-menu-item>
         </el-menu>
+        <!-- 导航结束 -->
       </el-aside>
       <el-container>
         <el-header>
           <div class="header-con">
-            <span>admin</span>
-            <el-button type="primary" @click="back">退出</el-button>
+            <span>{{user.username}}</span>
+            <el-button type="primary" @click="exit">退出</el-button>
           </div>
         </el-header>
         <el-main>
@@ -58,15 +56,26 @@
   </div>
 </template>
 <script>
+import { mapGetters, mapActions } from "vuex";
 export default {
-  components: {},
-  data() {
-    return {};
+  computed: {
+    ...mapGetters({
+      user: "user",
+    }),
+    //用来判断是否有目录
+    hasChildren(){
+      return this.user.menus[0].children?true:false
+    }
   },
   methods: {
-    back(){
+    ...mapActions({
+      changeUser: "changeUser",
+    }),
+    //退出
+    exit() {
+      this.changeUser(null);
       this.$router.push("/login")
-    }
+    },
   },
   mounted() {},
 };

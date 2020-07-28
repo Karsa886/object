@@ -22,7 +22,7 @@ export default {
       info: {
         show: false,
         title: "添加管理员",
-        isAdd: true,
+        isAdd:true
       },
     };
   },
@@ -31,13 +31,13 @@ export default {
     add() {
       this.info.show = true;
       this.info.title = "添加管理员";
-      this.info.isAdd = true;
+      this.info.isAdd=true
     },
     //点击了编辑
     edit(id) {
       this.info.show = true;
       this.info.title = "编辑管理员";
-      this.info.isAdd = false;
+       this.info.isAdd=false
       this.$refs.add.getDetail(id);
     },
   },

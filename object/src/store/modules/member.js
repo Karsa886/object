@@ -1,4 +1,4 @@
-import {requestCateList} from "../../util/request"
+import {requestMemberList} from "../../util/request"
 const state={
     //列表数据
     list:[]
@@ -12,7 +12,7 @@ const mutations={
 const actions={
     requestList(context){
         
-        requestCateList({istree:true}).then(res=>{
+        requestMembenList({istree:true}).then(res=>{
             context.commit("changeList",res.data.list)
         })
     }

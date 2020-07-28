@@ -22,24 +22,24 @@ export default {
       info: {
         //弹框的出现状态
         show: false,
-        title: "分类添加",
-        isAdd: true,
+        title:"分类添加",
+        isAdd:true
       },
     };
   },
   methods: {
     add() {
       this.info.show = true;
-      this.info.title = "分类添加";
-      this.info.isAdd = true;
+      this.info.title="分类添加"
+      this.info.isAdd=true
     },
-
-    edit(id) {
-      this.info.show = true;
-      this.info.title = "分类编辑";
-      this.info.isAdd = false;
-      this.$refs.add.getDetail(id);
-    },
+    //点击了编辑
+    edit(id){
+        this.info.show=true;
+         this.info.title="分类编辑"
+         this.info.isAdd=false
+        this.$refs.add.getDetail(id)
+    }
   },
   mounted() {},
 };

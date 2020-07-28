@@ -5,13 +5,8 @@
         <el-form-item label="所属角色" label-width="80px">
           <el-select v-model="form.roleid">
             <el-option label="--请选择--" value disabled></el-option>
-
-            <el-option
-              v-for="item in roleList"
-              :key="item.id"
-              :label="item.rolename"
-              :value="item.id"
-            ></el-option>
+            <!-- 动态数据 -->
+            <el-option v-for="item in roleList" :key="item.id" :label="item.rolename" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
 
@@ -56,9 +51,10 @@ export default {
       form: {
         roleid: "",
         username: "",
-        password: "",
+        password:"",
         status: 1,
       },
+     
     };
   },
   mounted() {
@@ -70,17 +66,17 @@ export default {
   methods: {
     ...mapActions({
       requestRoleList: "role/requestList",
-      requestManageList: "manage/requestList",
-      requestTotal: "manage/requestTotal",
+      requestManageList:"manage/requestList",
+      requestTotal:"manage/requestTotal"
     }),
     //置空
     empty() {
       this.form = {
         roleid: "",
         username: "",
-        password: "",
+        password:"",
         status: 1,
-      };
+      }
     },
     //取消
     cancel() {
@@ -91,6 +87,7 @@ export default {
     },
     //添加
     add() {
+      
       //发起添加请求
       requestManageAdd(this.form).then((res) => {
         if (res.data.code == 200) {
@@ -102,7 +99,7 @@ export default {
           //重新获取角色列表数据
           this.requestManageList();
           //重新获取总的数量
-          this.requestTotal();
+          this.requestTotal()
         } else {
           warningAlert(res.data.msg);
         }
@@ -113,11 +110,12 @@ export default {
       //ajax
       requestManageDetail({ uid: id }).then((res) => {
         this.form = res.data.list;
-        this.form.password = "";
+        this.form.password=""
       });
     },
     //点击了修改
     update() {
+     
       requestManageUpdate(this.form).then((res) => {
         if (res.data.code == 200) {
           successAlert("修改成功");

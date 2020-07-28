@@ -9,14 +9,14 @@ import "./assets/css/reset.css"
 
 //2.处理公共组件
 import commonComponents from "./components/index"
-for (let i in commonComponents) {
-  Vue.component(i, commonComponents[i])
+for(let i in commonComponents){
+  Vue.component(i,commonComponents[i])
 }
 
 //3.处理过滤器
 import filters from "./filters"
-for (let i in filters) {
-  Vue.filter(i, filters[i])
+for(let i in filters){
+  Vue.filter(i,filters[i])
 }
 //4.axios
 
@@ -29,7 +29,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUi)
 
 //图片前缀
-Vue.prototype.$imgPre = "http://localhost:3000"
+Vue.prototype.$imgPre="http://localhost:3000"
 
 
 /* eslint-disable no-new */
@@ -37,8 +37,6 @@ new Vue({
   el: '#app',
   router,
   store,
-  components: {
-    App
-  },
+  components: { App },
   template: '<App/>'
 })
