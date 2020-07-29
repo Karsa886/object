@@ -1,4 +1,4 @@
-import {httpcatelist} from '../../util/request'
+import {httpbannerlist} from '../../util/request'
 const state={
     list:[]
 }
@@ -9,8 +9,8 @@ const mutations={
 }
 const actions={
     requestlist(context){
-        httpcatelist().then(res=>{
-            context.commit('changelist',res.data.list)
+        httpbannerlist().then(res=>{
+            context.commit('changelist',res.data.list?res.data.list:[])
         })
     }
 }
@@ -19,6 +19,7 @@ const getters={
         return state.list
     }
 }
+
 export default {
     state,
     mutations,

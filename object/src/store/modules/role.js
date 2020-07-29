@@ -1,27 +1,25 @@
-import {requestRoleList} from "../../util/request"
+import {httprolelist} from '../../util/request'
 const state={
-    //列表数据
     list:[]
 }
 const mutations={
-    //修改list
-    changeList(state,arr){
-        state.list=arr;
+    changelist(state,arr){
+        state.list = arr
     }
 }
 const actions={
-    requestList(context){
-        
-        requestRoleList().then(res=>{
-            context.commit("changeList",res.data.list)
+    requestlist(context){
+        httprolelist().then(res=>{
+            context.commit('changelist',res.data.list?res.data.list:[])
         })
     }
 }
 const getters={
-    list(state){
+    list(){
         return state.list
     }
 }
+
 export default {
     state,
     mutations,

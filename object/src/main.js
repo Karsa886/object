@@ -3,40 +3,53 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+Vue.use(ElementUI);
 
-//1.引入reset.css 
-import "./assets/css/reset.css"
+//重置css
+import './assets/css/reset.css'
 
-//2.处理公共组件
-import commonComponents from "./components/index"
-for(let i in commonComponents){
+
+//vuex
+import store from './store'
+
+
+Vue.prototype.$img = 'http://localhost:3000'
+//公共组件
+import commonComponents from './components'
+for(var i in commonComponents){
   Vue.component(i,commonComponents[i])
 }
 
-//3.处理过滤器
-import filters from "./filters"
-for(let i in filters){
+
+//公共过滤器
+import filters from './filters'
+for(var i in filters){
   Vue.filter(i,filters[i])
 }
-//4.axios
 
-//5.vuex
-import store from "./store"
 
-//6.element-ui
-import ElementUi from "element-ui"
-import 'element-ui/lib/theme-chalk/index.css';
-Vue.use(ElementUi)
-
-//图片前缀
-Vue.prototype.$imgPre="http://localhost:3000"
+//全局守卫
+// router.beforeEach((to,from,next)=>{
+//       if(to.path=='/login'){
+//         next()
+//         return
+//       }
+//       var isLogin = localStorage.getItem('adm')
+//       if(isLogin){
+//         next()
+//         return
+//       }
+//       next('/login')
+// })
 
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
-  store,
   components: { App },
-  template: '<App/>'
+  template: '<App/>',
+  store,
 })

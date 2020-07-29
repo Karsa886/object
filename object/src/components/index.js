@@ -1,4 +1,7 @@
-import delBtn from "./delBtn.vue"
+
+import vNav from './vNav'
+
 export default {
-    delBtn
+    vNav
+    
 }

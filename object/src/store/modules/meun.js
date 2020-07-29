@@ -1,16 +1,16 @@
-import {httpcatelist} from '../../util/request'
+import {httpmeunList} from '../../util/request'
 const state={
     list:[]
 }
 const mutations={
-    changelist(state,arr){
-        state.list =arr
+    changelist(state,arr){  
+        state.list = arr
     }
 }
 const actions={
-    requestlist(context){
-        httpcatelist().then(res=>{
-            context.commit('changelist',res.data.list)
+    requestmeunList(context){
+        httpmeunList().then(res=>{
+            context.commit('changelist',res.data.list?res.data.list:[])
         })
     }
 }
@@ -19,6 +19,8 @@ const getters={
         return state.list
     }
 }
+
+
 export default {
     state,
     mutations,

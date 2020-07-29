@@ -1,16 +1,16 @@
-import {httpcatelist} from '../../util/request'
+import {httpsecklist} from '../../util/request'
 const state={
     list:[]
 }
 const mutations={
     changelist(state,arr){
-        state.list =arr
+        state.list= arr
     }
 }
 const actions={
     requestlist(context){
-        httpcatelist().then(res=>{
-            context.commit('changelist',res.data.list)
+        httpsecklist().then(res=>{
+            context.commit('changelist',res.data.list?res.data.list:[])
         })
     }
 }
@@ -19,6 +19,7 @@ const getters={
         return state.list
     }
 }
+
 export default {
     state,
     mutations,

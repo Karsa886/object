@@ -1,168 +1,133 @@
 <template>
-  <div class="add">
-    <el-dialog :title="info.title" :visible.sync="info.show">
-      <el-form :model="form">
-        <el-form-item label="规格名称" label-width="80px">
+  <div>
+    <el-dialog :title="add.title" :visible.sync="add.show" @closed="closed">
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="规格名称">
           <el-input v-model="form.specsname"></el-input>
         </el-form-item>
-        <el-form-item v-for="(item,index) in attrArr" :key="index" label="规格属性" label-width="80px">
-          <el-input v-model="item.value"></el-input>
-          <el-button type="primary" v-if="index==0" @click="addAttr">新增规格属性</el-button>
-          <el-button type="danger" v-else @click="delAttr(index)">删除</el-button>
+
+        <el-form-item label="规格属性">
+          <el-input v-model="attrs"></el-input>
+          <el-button type="primary" @click="addattrs">新增规格属性</el-button>
         </el-form-item>
 
-        <el-form-item label="状态" label-width="80px">
-          <el-switch v-model="form.status" :active-value="1" :inactive-value="2"></el-switch>
+        <el-form-item label="规格属性" v-for="(item,index) in form.attrs" :key="index">
+          <div style="display:flex">
+            <el-input v-model="form.attrs[index]"></el-input>
+            <el-button type="danger" @click="del(index)" style="float: right;">删除</el-button>
+          </div>
+        </el-form-item>
+
+        <el-form-item label="状态">
+          <el-switch
+            v-model="form.status"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            :active-value="1"
+            :inactive-value="2"
+          ></el-switch>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" v-if="add.isAdd" @click="add2">添加</el-button>
+          <el-button type="primary" v-else @click="edit">修改</el-button>
+          <el-button @click="close">取消</el-button>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="cancel()">取 消</el-button>
-        <el-button type="primary" @click="add" v-if="info.isAdd">添 加</el-button>
-        <el-button type="primary" @click="update" v-else>修 改</el-button>
-      </div>
     </el-dialog>
   </div>
 </template>
+
 <script>
-import { mapGetters, mapActions } from "vuex";
 import {
-  requestSpecAdd,
-  requestSpecDetail,
-  requestSpecUpdate,
+  httpspecsadd,
+  httpspecsedit,
+  httpspecsinfo,
 } from "../../../util/request";
-import { successAlert, warningAlert } from "../../../util/alert";
+import { mapGetters, mapActions } from "vuex";
+import { success, warning } from "../../../util/alert";
 export default {
-  props: ["info"],
-  components: {},
-  computed: {
-    ...mapGetters({
-      roleList: "role/list",
-    }),
-  },
+  props: ["add"],
   data() {
     return {
-      attrArr: [
-        {
-          value: "",
-        },
-      ],
-
-      //提交给后端的数据
+      attrs: "",
       form: {
         specsname: "",
-        attrs: "",
+        attrs: [],
         status: 1,
       },
     };
   },
-  mounted() {
-   
-  },
   methods: {
     ...mapActions({
-      
-      requestList: "spec/requestList",
-      requestTotal: "spec/requestTotal",
+      requestlist: "spec/requestlist",
+      requesttotal: "spec/requesttotal",
     }),
-
-    //新增规格属性
-    addAttr() {
-      this.attrArr.push({
-        value: "",
-      });
+    close() {
+      this.add.show = false;
+      this.clear();
     },
-    //删除规格属性
-    delAttr(index) {
-      this.attrArr.splice(index, 1);
-    },
-
-    //置空
-    empty() {
+    clear() {
       this.form = {
         specsname: "",
-        attrs: "",
+        attrs: [],
         status: 1,
       };
-      this.attrArr = [
-        {
-          value: "",
-        },
-      ];
     },
-    //取消
-    cancel() {
-      this.info.show = false;
-      if (!this.info.isAdd) {
-        this.empty();
+    addattrs() {
+      if (this.attrs) {
+        this.form.attrs.push(this.attrs);
+        this.attrs = "";
       }
     },
-    //添加
-    add() {
-      if (this.attrArr.some((item) => item.value == "")) {
-        warningAlert("属性规格均不能为空");
-        return;
-      }
-
-      this.form.attrs = JSON.stringify(this.attrArr.map((item) => item.value));
-      //发起添加请求
-      requestSpecAdd(this.form).then((res) => {
-        if (res.data.code == 200) {
-          successAlert(res.data.msg);
-          //清空
-          this.empty();
-          //弹框消失
-          this.cancel();
-          //重新获取角色列表数据
-          this.requestTotal();
-          //重新获取总的数量
-          this.requestList();
-        } else {
-          warningAlert(res.data.msg);
-        }
-      });
+    del(index) {
+      this.form.attrs.splice(index, 1);
+      console.log(this.form.attrs);
     },
-    //获取一条数据
-    getDetail(id) {
-      //ajax
-      requestSpecDetail({ id: id }).then((res) => {
+    add2() {
+      if (this.form.specsname && this.form.attrs) {
+        this.form.attrs = JSON.stringify(this.form.attrs);
+        httpspecsadd(this.form).then((res) => {
+          if (res.data.code == 200) {
+            success(res.data.msg);
+            this.clear();
+            this.add.show = false;
+            this.requestlist();
+            this.requesttotal();
+          } else {
+            this.del();
+            warning(res.data.msg);
+          }
+        });
+      } else {
+        warning("请输入内容");
+      }
+    },
+    getone(id) {
+      httpspecsinfo(id).then((res) => {
         this.form = res.data.list[0];
-        this.attrArr = JSON.parse(res.data.list[0].attrs).map((item) => ({
-          value: item,
-        }));
+        this.form.attrs = JSON.parse(res.data.list[0].attrs);
       });
     },
-    //点击了修改
-    update() {
-       if (this.attrArr.some((item) => item.value == "")) {
-        warningAlert("属性规格均不能为空");
-        return;
-      }
-
-      this.form.attrs = JSON.stringify(this.attrArr.map((item) => item.value));
-      requestSpecUpdate(this.form).then((res) => {
+    edit() {
+      this.form.attrs = JSON.stringify(this.form.attrs);
+      httpspecsedit(this.form).then((res) => {
         if (res.data.code == 200) {
-          successAlert("修改成功");
-          this.empty();
-          this.cancel();
-          this.requestList();
+          success(res.data.msg);
+          this.add.show = false;
+          this.requestlist();
+          this.clear();
         } else {
-          warningAlert(res.data.msg);
+          warning(res.data.msg);
         }
       });
+    },
+    closed() {
+      this.clear();
     },
   },
 };
 </script>
-<style scoped lang="stylus">
-.add >>> .el-form-item__content {
-  display: flex !important;
-}
 
-.add >>> .el-input {
-  flex: 1;
-}
-
-.add >>> .el-button {
-  width: auto;
-}
+<style>
 </style>

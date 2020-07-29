@@ -1,72 +1,73 @@
-import { requestGoodsList, requestGoodsCount } from "../../util/request"
+import {
+  httpgoodscount,
+  httpgoodslist
+} from '../../util/request'
 const state = {
-    //列表数据
-    list: [],
-    //一页的数量
-    size: 2,
-    //数据总数量
-    total: 0,
-    //当前的页码
-    page: 1
+  list:[],
+  page:1,
+  size:2,
+  total:0,
+  
 }
 const mutations = {
-    //修改list
-    changeList(state, arr) {
-        state.list = arr;
+    changelist(state,arr){
+        state.list = arr
     },
-    //修改总数
-    changeTotal(state, num) {
-        state.total = num;
+    changepage(state,page){
+        state.page=page
     },
-    //修改当前页码
-    changePage(state, page) {
-        state.page = page
-    }
+    changesize(state,size){
+        state.size=size
+    },
+    changetotal(state,total){
+        state.total=total
+    },
 }
 const actions = {
-    //获取列表数据
-   
-    requestList(context) {
-        const params = {
-            page: context.state.page,
-            size: context.state.size
-        }
-        requestGoodsList(params).then(res => {
-            //没有取到数据
-            if (res.data.list.length == 0 && context.state.page > 1) {
-                context.commit("changePage", context.state.page - 1);
-                context.dispatch("requestList")
-                return;
+    requestlist(context,bool){
+        let json={}
+        if(bool){
+            json={}
+        }else{
+            json = {
+                page:context.state.page,
+                size:context.state.size,
             }
-            context.commit("changeList", res.data.list)
+        }
+        
+        httpgoodslist(json).then(res=>{
+            context.commit('changelist',res.data.list?res.data.list:[])
         })
     },
-    //获取总的数量
-    requestTotal(context) {
-        requestGoodsCount().then(res => {
-            context.commit("changeTotal", res.data.list[0].total)
+    requesttotal(context){
+        httpgoodscount().then(res=>{
+            context.commit('changetotal',res.data.list[0].total)
         })
     },
-    //页面修改页码
-    changePage(context, page) {
-        context.commit("changePage", page)
+    changepage(context,page){
+        context.commit('changepage',page)
     }
 }
 const getters = {
-    list(state) {
+    list(){
         return state.list
     },
-    total(state) {
-        return state.total;
+    page(){
+        return state.page
     },
-    size(state) {
+    size(){
         return state.size
-    }
+    },
+    total(){
+        return state.total
+    },
+  
 }
+
 export default {
-    state,
-    mutations,
-    actions,
-    getters,
-    namespaced: true
+  state,
+  mutations,
+  actions,
+  getters,
+  namespaced:true
 }

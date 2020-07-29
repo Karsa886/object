@@ -1,103 +1,131 @@
 <template>
   <div>
-    <el-table :data="list" style="width: 100%">
-      <el-table-column prop="id" label="商品编号" width="180"></el-table-column>
-      <el-table-column prop="goodsname" label="商品名称" width="180"></el-table-column>
-      <el-table-column label="图片" width="180">
+      <el-table
+      :data="list"
+      style="width: 100%"
+      row-key="id"
+      border
+      lazy
+      :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+    >
+      <el-table-column prop="id" label="商品编号" width="80"></el-table-column>
+      <el-table-column prop="goodsname" label="商品名称"></el-table-column>
+      <el-table-column prop="price" label="商品价格"></el-table-column>
+      <el-table-column prop="market_price" label="市场价格"></el-table-column>
+      <el-table-column label="图片">
         <template slot-scope="scope">
-            <img :src="$imgPre+scope.row.img" alt="">
+          <img :src='$img+scope.row.img' style="width:100%">
         </template>
+        
       </el-table-column>
+
       <el-table-column label="是否新品">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.isnew==1" type="primary">是</el-button>
-          <el-button v-else type="info">否</el-button>
+          <el-button type="primary" v-if="scope.row.status">是</el-button>
+          <el-button type="info" v-else>否</el-button>
         </template>
       </el-table-column>
       <el-table-column label="是否热卖">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.ishot==1" type="primary">是</el-button>
-          <el-button v-else type="info">否</el-button>
+          <el-button type="primary" v-if="scope.row.status">是</el-button>
+          <el-button type="info" v-else>否</el-button>
         </template>
       </el-table-column>
       <el-table-column label="状态">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.status==1" type="primary">启用</el-button>
-          <el-button v-else type="info">禁用</el-button>
+          <el-button type="primary" v-if="scope.row.status">启用</el-button>
+          <el-button type="info" v-else>禁用</el-button>
         </template>
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button type="primary" @click="edit(scope.row.id)">编辑</el-button>
-          <del-btn @confirm="del(scope.row.id)"></del-btn>
+          <el-button type="danger" @click="del(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <!-- 分页 -->
-
     <el-pagination
       background
       layout="prev, pager, next"
-      @current-change="cPage"
-      :page-size="size"
       :total="total"
+      :page-size="size"
+      @current-change="pages"
     ></el-pagination>
   </div>
 </template>
-<script>
-import { mapGetters, mapActions } from "vuex";
-import { requestGoodsDelete } from "../../../util/request";
-import { successAlert, warningAlert } from "../../../util/alert";
-export default {
-  components: {},
-  computed: {
-    ...mapGetters({
-      list: "goods/list",
-      total: "goods/total",
-      size: "goods/size",
-    }),
-  },
-  data() {
-    return {};
-  },
-  methods: {
-    ...mapActions({
-      requestList: "goods/requestList",
-      requestTotal: "goods/requestTotal",
-      changePage: "goods/changePage",
-    }),
-    edit(id) {
-      this.$emit("edit", id);
-    },
-    //删除
-    del(id) {
-      requestGoodsDelete({ id: id }).then((res) => {
-        if (res.data.code == 200) {
-          successAlert("删除成功");
 
-          this.requestList();
-          this.requestTotal();
-        } else {
-          warningAlert(res.data.msg);
-        }
-      });
-    },
-    //修改页码
-    cPage(a) {
-      this.changePage(a);
-      this.requestList();
-    },
+<script>
+import {mapGetters,mapActions} from 'vuex'
+import { success, warning } from "../../../util/alert";
+import {httpgoodsedit,httpgoodsdelete} from '../../../util/request'
+export default {
+  data(){
+    return {
+      
+    }
   },
-  mounted() {
-    this.requestTotal();
-    this.requestList();
+  computed:{
+    ...mapGetters({
+       list:'goods/list',
+       page:'goods/page',
+       size:'goods/size',
+       total:'goods/total',
+       
+    })
   },
-};
-</script>
-<style scoped>
-img{
-  width: 80px;
-  height: 80px;
+  methods:{
+    ...mapActions({
+      requestlist:'goods/requestlist',
+      requesttotal:'goods/requesttotal',
+      changepage:'goods/changepage'
+    }),
+    del(id) {
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          httpgoodsdelete(id).then((res) => {
+            if (res.data.code == 200) {
+              this.pages()
+              this.requestlist();
+              this.requesttotal()
+            } else {
+              warning(res.data.msg);
+            }
+          });
+
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+
+    edit(id){
+      this.$emit('edit',id)
+    },
+    pages(a){
+      this.changepage(a)
+      this.requestlist()
+      
+    }
+  },
+  mounted(){
+    this.requestlist()
+    this.requesttotal()
+  }
 }
+</script>
+
+<style>
+
 </style>

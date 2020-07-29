@@ -1,22 +1,25 @@
-import Vue from "vue"
-var vm=new Vue();
-//成功弹框
-export const successAlert = (msg)=>{
-    vm.$message({
-        message: msg,
-        type: 'success'
-    });
+import Vue from 'vue'
+const vm = new Vue()
+
+
+export const open1=(msg)=> {
+    vm.$message(msg);
 }
 
-//警告弹框
-export const warningAlert = (msg)=>{
+export const success=(msg)=>{
     vm.$message({
-        message: msg,
-        type: 'warning'
+      message: msg,
+      type: 'success'
     });
-}
+  }
 
-//错误弹框
-export const errorAlert = (msg)=>{
+  export const  warning=(msg) =>{
+    vm.$message({
+      message: msg,
+      type: 'warning'
+    });
+  }
+
+  export const error=(msg) =>{
     vm.$message.error(msg);
-}
+  }

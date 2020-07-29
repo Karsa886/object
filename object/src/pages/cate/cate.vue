@@ -1,16 +1,15 @@
 <template>
   <div>
-    <el-button type="primary" @click="add">添加</el-button>
-    <!-- 添加弹框 -->
-    <v-add :info="info" ref="add"></v-add>
-
-    <!-- 列表 -->
+    <el-button type="primary" @click="add2">添加</el-button>
+    <v-add :add="add" ref="edit"></v-add>
     <v-list @edit="edit"></v-list>
   </div>
 </template>
+
 <script>
 import vAdd from "./components/add";
 import vList from "./components/list";
+
 export default {
   components: {
     vAdd,
@@ -18,31 +17,28 @@ export default {
   },
   data() {
     return {
-      //传递给子组件的信息
-      info: {
-        //弹框的出现状态
+      add: {
         show: false,
-        title:"分类添加",
-        isAdd:true
+        title: "商品添加",
+        isAdd: true,
       },
     };
   },
   methods: {
-    add() {
-      this.info.show = true;
-      this.info.title="分类添加"
-      this.info.isAdd=true
+    add2() {
+      this.add.show = true;
+      this.add.title = "商品添加";
+      this.add.isAdd = true;
     },
-    //点击了编辑
-    edit(id){
-        this.info.show=true;
-         this.info.title="分类编辑"
-         this.info.isAdd=false
-        this.$refs.add.getDetail(id)
-    }
+    edit(id) {
+      this.add.show = true;
+      this.add.title = "商品编辑";
+      this.add.isAdd = false;
+      this.$refs.edit.getone(id);
+    },
   },
-  mounted() {},
 };
 </script>
-<style scoped>
+
+<style>
 </style>

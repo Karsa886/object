@@ -1,134 +1,148 @@
 <template>
   <div>
-    <el-dialog :title="info.title" :visible.sync="info.show">
-      <el-form :model="form">
-        <el-form-item label="所属角色" label-width="80px">
-          <el-select v-model="form.roleid">
-            <el-option label="--请选择--" value disabled></el-option>
-            <!-- 动态数据 -->
-            <el-option v-for="item in roleList" :key="item.id" :label="item.rolename" :value="item.id"></el-option>
+    <el-dialog :title="add.title" :visible.sync="add.show" @closed='closed'>
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="所属角色">
+          <el-select v-model="form.roleid" placeholder>
+            <el-option label="--请选择--" disabled value></el-option>
+            <el-option
+              v-for="item in roleid"
+              :key="item.id"
+              :label="item.rolename"
+              :value="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
 
-        <el-form-item label="用户名" label-width="80px">
-          <el-input v-model="form.username"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" label-width="80px">
-          <el-input v-model="form.password" show-password></el-input>
+        <el-form-item label="用户名">
+          <el-input v-model="form.username" @blur="regusername"></el-input>
         </el-form-item>
 
-        <el-form-item label="状态" label-width="80px">
-          <el-switch v-model="form.status" :active-value="1" :inactive-value="2"></el-switch>
+        <el-form-item label="密码" >
+          <el-input
+            placeholder="请输入密码"
+            clearable
+            show-password
+            v-model="form.password"
+            @blur="regpassword"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item label="状态">
+          <el-switch
+            v-model="form.status"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            :active-value="1"
+            :inactive-value="2"
+          ></el-switch>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="addone" v-if="add.isAdd">添加</el-button>
+          <el-button type="primary" v-else @click="edit">修改</el-button>
+          <el-button @click="close">取消</el-button>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="cancel()">取 消</el-button>
-        <el-button type="primary" @click="add" v-if="info.isAdd">添 加</el-button>
-        <el-button type="primary" @click="update" v-else>修 改</el-button>
-      </div>
     </el-dialog>
   </div>
 </template>
+
 <script>
-import { mapGetters, mapActions } from "vuex";
-import {
-  requestManageAdd,
-  requestManageDetail,
-  requestManageUpdate,
-} from "../../../util/request";
-import { successAlert, warningAlert } from "../../../util/alert";
+import { httpuseradd, httpuserinfo, httpuseredit } from "../../../util/request";
+import { success, warning } from "../../../util/alert";
+import { mapActions, mapGetters } from "vuex";
+import { usernamereg, passreg } from "../../../util/reg";
+
 export default {
-  props: ["info"],
-  components: {},
+  props: ["add"],
   computed: {
     ...mapGetters({
-      roleList: "role/list",
+      roleid: "role/list",
     }),
   },
   data() {
     return {
-      //提交给后端的数据
       form: {
         roleid: "",
         username: "",
-        password:"",
+        password: "",
         status: 1,
       },
-     
+      hide: true,
     };
-  },
-  mounted() {
-    //如果之前menu的list没有请求，就发请求，请求你过了，就不发了
-    if (this.roleList.length === 0) {
-      this.requestRoleList();
-    }
   },
   methods: {
     ...mapActions({
-      requestRoleList: "role/requestList",
-      requestManageList:"manage/requestList",
-      requestTotal:"manage/requestTotal"
+      reqrolelist: "role/requestlist",
+      requestuser: "manage/requestuser",
+      requesttotal: "manage/requesttotal",
     }),
-    //置空
-    empty() {
+    clear() {
       this.form = {
         roleid: "",
         username: "",
-        password:"",
+        password: "",
         status: 1,
+      };
+    },
+    addone() {
+      if (this.form.username && this.form.password) {
+        httpuseradd(this.form).then((res) => {
+          if (res.data.code) {
+            this.requestuser();
+            this.add.show = false;
+            this.clear();
+            this.requesttotal();
+            success(res.data.msg);
+          } else {
+            warning(res.data.msg);
+          }
+        });
+      }else{
+        warning('请输入内容')
       }
     },
-    //取消
-    cancel() {
-      this.info.show = false;
-      if (!this.info.isAdd) {
-        this.empty();
-      }
-    },
-    //添加
-    add() {
-      
-      //发起添加请求
-      requestManageAdd(this.form).then((res) => {
-        if (res.data.code == 200) {
-          successAlert(res.data.msg);
-          //清空
-          this.empty();
-          //弹框消失
-          this.cancel();
-          //重新获取角色列表数据
-          this.requestManageList();
-          //重新获取总的数量
-          this.requestTotal()
-        } else {
-          warningAlert(res.data.msg);
-        }
-      });
-    },
-    //获取一条数据
-    getDetail(id) {
-      //ajax
-      requestManageDetail({ uid: id }).then((res) => {
+    getone(uid) {
+      this.hide = false;
+      httpuserinfo(uid).then((res) => {
         this.form = res.data.list;
-        this.form.password=""
       });
     },
-    //点击了修改
-    update() {
-     
-      requestManageUpdate(this.form).then((res) => {
+    edit() {
+      httpuseredit(this.form).then((res) => {
         if (res.data.code == 200) {
-          successAlert("修改成功");
-          this.empty();
-          this.cancel();
-          this.requestManageList();
+          success(res.data.msg);
+          this.requestuser();
+          this.add.show=false
+          this.clear();
         } else {
-          warningAlert(res.data.msg);
+          warning(res.data.msg);
         }
       });
     },
+    close() {
+      (this.add.show = false), this.clear();
+    },
+    regusername() {
+      if (!usernamereg().test(this.form.username)) {
+        warning("请输入正确的用户名，只能是英文字母");
+      }
+    },
+    regpassword() {
+      // if (!passreg().test(this.form.password)) {
+      //   warning("请输入6-12位的数字和字母的密码");
+      // }
+    },
+    closed(){
+      this.clear()
+    }
+  },
+  mounted() {
+    this.reqrolelist();
   },
 };
 </script>
-<style scoped>
+
+<style>
 </style>

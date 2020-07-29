@@ -2,18 +2,11 @@
   <div class="box">
     <el-dialog :title="add.title" :visible.sync="add.show" @closed='closed'>
       <el-form ref="form" :model="form" label-width="80px">
-        <el-form-item label="上级分类">
-          <el-select v-model="form.pid" placeholder="请选择">
-            <el-option label="顶级分类" :value="0"></el-option>
-            <el-option v-for="item in list" :key="item.id" :label="item.catename" :value="item.id"></el-option>
-          </el-select>
+        <el-form-item label="标题">
+          <el-input v-model="form.title"></el-input>
         </el-form-item>
 
-        <el-form-item label="分类名称">
-          <el-input v-model="form.catename" @blur="regcatename"></el-input>
-        </el-form-item>
-
-        <el-form-item label="图片" v-if="form.pid!==0">
+        <el-form-item label="图片">
           <el-upload class="avatar-uploader" action="#" :show-file-list="false" :on-change="pic">
             <img v-if="imageUrl" :src="imageUrl" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -32,7 +25,7 @@
 
         <el-form-item>
           <el-button type="primary" @click="add1" v-if="add.isAdd">添加</el-button>
-          <el-button type="primary" @click="edit" v-else>修改</el-button>
+          <el-button type="primary" @click="edit" v-else>编辑</el-button>
           <el-button @click="close">取消</el-button>
         </el-form-item>
       </el-form>
@@ -41,106 +34,92 @@
 </template>
 
 <script>
-import { httpcateadd, httpcateedit, httpcateinfo } from "../../../util/request";
-import { mapGetters, mapActions } from "vuex";
+import {
+  httpbanneradd,
+  httpbannerinfo,
+  httpbanneredit,
+} from "../../../util/request";
 import { success, warning } from "../../../util/alert";
-import { stringreg } from "../../../util/reg";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   props: ["add"],
   data() {
     return {
+      imageUrl: "",
       form: {
-        pid: 0,
-        catename: "",
+        title: "",
         img: "",
         status: 1,
       },
-
-      imageUrl: "",
     };
   },
+  computed: {},
   methods: {
     ...mapActions({
-      requestlist: "cate/requestlist",
+      requestlist: "banner/requestlist",
     }),
-    pic(a) {
-      let reg = /(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/;
-      let extname = a.name.slice(a.name.lastIndexOf("."));
-      if (reg.test(extname)) {
-        if (a.size < 2 * 1024 * 1024) {
-          this.imageUrl = URL.createObjectURL(a.raw);
-          this.form.img = a.raw;
-        } else {
-          warning("图片不能大于2M");
-        }
-      } else {
-        warning("只能上传图片哦");
-      }
+    close() {
+      this.add.show = false;
+      this.clear();
     },
     clear() {
       this.form = {
-        pid: 0,
-        catename: "",
+        title: "",
         img: "",
         status: 1,
       };
+      this.imageUrl = "";
     },
-
     add1() {
-      if (this.form.catename) {
-        httpcateadd(this.form).then((res) => {
-          this.add.show = false;
-          this.requestlist();
+      if (this.form.title && this.form.img) {
+        httpbanneradd(this.form).then((res) => {
+          if (res.data.code == 200) {
+            success(res.data.msg);
+            this.add.show = false;
+            this.clear();
+            this.requestlist();
+          } else {
+            warning(res.data.msg);
+          }
         });
       }else{
         warning('请输入内容')
       }
     },
-
+    pic(a) {
+      let reg = /(\.gif|\.jpeg|\.png|\.jpg|\.bmp)/;
+      let extname = a.name.slice(a.name.lastIndexOf("."));
+      if (reg.test(extname)) {
+        this.imageUrl = URL.createObjectURL(a.raw);
+        this.form.img = a.raw;
+      } else {
+        warning("只能上传图片哦");
+      }
+    },
     getone(id) {
-      httpcateinfo(id).then((res) => {
+      httpbannerinfo(id).then((res) => {
         this.form = res.data.list;
-        this.form.id = id;
+        this.form.id = id
         this.imageUrl = this.$img + this.form.img;
         console.log(this.form)
       });
     },
-
     edit() {
-      httpcateedit(this.form).then((res) => {
+      
+      httpbanneredit(this.form).then((res) => {
         if (res.data.code == 200) {
           success(res.data.msg);
-          this.clear();
-          this.requestlist()
-          this.add.show = false;
+          this.close();
+          this.requestlist();
         } else {
           warning(res.data.msg);
         }
       });
     },
-
-    close() {
-      this.add.show = false;
-      this.add.isAdd = true;
-      this.clear();
-    },
-
-    regcatename() {
-      // if (!stringreg().test(this.form.catename)) {
-      //   warning("请输入汉字和字母");
-      // }
-    },
-
     closed(){
       this.clear()
     }
-  },
-
-  computed: {
-    ...mapGetters({
-      list: "cate/list",
-    }),
   },
 };
 </script>

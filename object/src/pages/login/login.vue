@@ -1,77 +1,105 @@
 <template>
-  <div class="login">
-    <div class="con">
-      <h3>登录</h3>
-      <el-input v-model="user.username" class="input" clearable></el-input>
-      <el-input v-model="user.password" class="input" clearable show-password></el-input>
-      <div class="btn-box">
-        <el-button type="primary" @click="login">登录</el-button>
+  <div id="wrap" @keydown.enter="d">
+    <div class="box">
+      <h2>登陆</h2>
+      <div class="from">
+        <div class="user">
+          <el-input placeholder="请输入用户名" v-model="user.username" clearable class="w"></el-input>
+        </div>
+        <div class="pass">
+          <el-input placeholder="请输入密码" v-model="user.password" clearable show-password class="w"></el-input>
+        </div>
+        <div class="btn">
+          <el-button type="primary" class="b" @click="login" >登陆</el-button>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
 <script>
-import {requestLogin} from "../../util/request"
-import {successAlert,warningAlert} from "../../util/alert"
-import {mapActions} from "vuex"
+import { mapGetters, mapActions } from "vuex";
+import { httpuserlogin } from "../../util/request";
+import { warning, success } from "../../util/alert";
 export default {
-  components: {},
   data() {
     return {
-      user:{
-        username:"",
-        password:""
-      }
+      user: {
+        username: "",
+        password: "",
+      },
     };
   },
   methods: {
     ...mapActions({
-      "changeUser":"changeUser"
+      changeuser: "changeuser",
     }),
-      login(){
-          // this.$router.push("/")
-          requestLogin(this.user).then(res=>{
-            if(res.data.code===200){
-              //登录成功
-              successAlert("登录成功")
-              //vuex保存了用户信息
-              this.changeUser(res.data.list)
-              //跳转页面
-              this.$router.push("/home")
-            }else{
-              warningAlert(res.data.msg)
-            }
-          })
-      }
+    login() {
+      httpuserlogin(this.user).then((res) => {
+        if (res.data.code == 200) {
+          this.changeuser(res.data.list);
+          console.log(this.users);
+          success(res.data.msg);
+          this.$router.push("/home");
+        } else {
+          warning(res.data.msg);
+        }
+      });
+    },
+    d() {
+      httpuserlogin(this.user).then((res) => {
+        if (res.data.code == 200) {
+          this.changeuser(res.data.list);
+          console.log(this.users);
+          success(res.data.msg);
+          this.$router.push("/home");
+        } else {
+          warning(res.data.msg);
+        }
+      });
+    },
   },
-  mounted() {},
+  computed: {
+    ...mapGetters({
+      users: "user",
+    }),
+  },
 };
 </script>
+
 <style scoped>
-.login {
+#wrap {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(to right, #553444, #303d60);
+  background-image: linear-gradient(to right, #563443, #303d60);
 }
-.con {
-  width: 400px;
-  padding: 20px;
+.b{
+  margin-left: 25px;
+}
+.box {
+  width: 300px;
+  height: 250px;
   background: #fff;
-  border-radius: 20px;
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  border-radius: 10px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
-h3 {
-  line-height: 60px;
-  font-size: 30px;
+h2 {
   text-align: center;
 }
-.input {
-  margin-bottom: 20px;
+.w {
+  width: 300px;
+  margin-bottom: 10px;
+  margin-left: -90px;
 }
-.btn-box {
-  text-align: center;
+.from {
+  margin-left: 90px;
 }
 </style>

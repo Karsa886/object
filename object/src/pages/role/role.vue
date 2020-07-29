@@ -1,48 +1,46 @@
 <template>
   <div>
-    <el-button type="primary" @click="add">添加</el-button>
-
-    <!-- 添加弹框 -->
-    <v-add :info="info" ref="add"></v-add>
-
-    <!-- 列表 -->
-    <v-list @edit="edit($event)"></v-list>
+    <el-button type="primary" @click='add2'>添加</el-button>
+    <v-add :add='add' ref='edit'></v-add>
+    <v-list @edit='edit'></v-list>
   </div>
 </template>
+
 <script>
-import vAdd from "./components/add";
-import vList from "./components/list";
+import vAdd from './components/add'
+import vList from './components/list'
 export default {
-  components: {
+  components:{
     vAdd,
-    vList,
+    vList
   },
-  data() {
+  data(){
     return {
-      info: {
-        show: false,
-        title: "添加角色",
+      add:{
+        show:false,
+        title:'角色添加',
         isAdd:true
-      },
-    };
+      }
+    }
   },
-  methods: {
-    //点击了添加按钮
-    add() {
-      this.info.show = true;
-      this.info.title = "添加角色";
-      this.info.isAdd=true
+  methods:{
+    edit(id){
+      console.log(id)
+      this.add.show=true;
+      this.add.title='角色编辑';
+      this.add.isAdd=false;
+      this.$refs.edit.getinfo(id)
     },
-    //点击了编辑
-    edit(id) {
-      this.info.show = true;
-      this.info.title = "编辑角色";
-       this.info.isAdd=false
-      this.$refs.add.getDetail(id);
-    },
-  },
-  mounted() {},
-};
+    add2(){
+      this.add={
+        show:true,
+        title:'角色添加',
+        isAdd:true
+      }
+    }
+  }
+}
 </script>
-<style scoped>
+
+<style>
 </style>

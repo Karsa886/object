@@ -1,80 +1,81 @@
-import { requestSpecList, requestSpecCount } from "../../util/request"
+import {
+  httpspecslist,
+  httpspecscount
+} from '../../util/request'
+
 const state = {
-    //列表数据
-    list: [],
-    //一页的数量
-    size: 2,
-    //数据总数量
-    total: 0,
-    //当前的页码
-    page: 1
+  list: [],
+  page: 1,
+  size: 2,
+  total: 0,
+
 }
 const mutations = {
-    //修改list
-    changeList(state, arr) {
-        arr.forEach(i => {
-            i.attrs = JSON.parse(i.attrs)
-        });
-        state.list = arr;
-    },
-    //修改总数
-    changeTotal(state, num) {
-        state.total = num;
-    },
-    //修改当前页码
-    changePage(state, page) {
-        state.page = page
-    }
+  changelist(state, arr) {
+
+    arr.forEach(item => {
+      item.attrs = JSON.parse(item.attrs)
+    });
+    state.list = arr
+
+  },
+  changepage(state, page) {
+    state.page = page
+  },
+  changesize(state, size) {
+    state.size = size
+  },
+  changetotal(state, total) {
+    state.total = total
+  },
 }
 const actions = {
-    //获取列表数据
-    //调用这个action,如果要分页，就不用传参；如果要取所有的数据，就传递一个true
-    requestList(context, bool) {
-        var params = {}
-        if (bool) {
-            params = {}
-        } else {
-            params = {
-                page: context.state.page,
-                size: context.state.size
-            }
-        }
-        requestSpecList(params).then(res => {
-            //没有取到数据
-            if (res.data.list.length == 0 && context.state.page > 1) {
-                context.commit("changePage", context.state.page - 1);
-                context.dispatch("requestList")
-                return;
-            }
-            context.commit("changeList", res.data.list)
-        })
-    },
-    //获取总的数量
-    requestTotal(context) {
-        requestSpecCount().then(res => {
-            context.commit("changeTotal", res.data.list[0].total)
-        })
-    },
-    //页面修改页码
-    changePage(context, page) {
-        context.commit("changePage", page)
+  requestlist(context, bol) {
+    let params = {}
+    if (bol) {
+      params = {}
+    } else {
+      params = {
+        page: context.state.page,
+        size: context.state.size
+      }
     }
+    httpspecslist(params).then(res => {
+
+      context.commit('changelist', res.data.list)
+    })
+  },
+  requesttotal(context) {
+    httpspecscount().then(res => {
+      context.commit('changetotal', res.data.list[0].total)
+    })
+  },
+  requestpage(context, page) {
+    context.commit('changepage', page)
+  },
+
+
+
 }
 const getters = {
-    list(state) {
-        return state.list
-    },
-    total(state) {
-        return state.total;
-    },
-    size(state) {
-        return state.size
-    }
+  list() {
+    return state.list
+  },
+  page() {
+    return state.page
+  },
+  size() {
+    return state.size
+  },
+  total() {
+    return state.total
+  }
 }
+
 export default {
-    state,
-    mutations,
-    actions,
-    getters,
-    namespaced: true
+  state,
+  mutations,
+  actions,
+  getters,
+  namespaced: true
 }

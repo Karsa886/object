@@ -1,5 +1,6 @@
 export default {
-    changeUser(context,obj){
-        context.commit("changeUser",obj)
+    changeuser(context,json){
+        context.commit('changeuser',json)
+        
     }
 }
